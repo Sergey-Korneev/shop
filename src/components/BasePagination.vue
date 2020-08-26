@@ -45,13 +45,17 @@ export default {
       this.$emit('pagenate', page);
     },
     nextPage() {
-      return this.page + 1;
+      if (this.page !== this.allPage) {
+        return this.page + 1;
+      }
+      return this.allPage;
     },
     backPage() {
-      return this.page - 1;
+      if (this.page !== 1) {
+        return this.page - 1;
+      }
+      return 1;
     },
   },
 };
 </script>
-
-// :class="{'pagination__link--current')"
