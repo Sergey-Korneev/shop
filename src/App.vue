@@ -10,7 +10,8 @@
     </div>
 
     <div class="content__catalog">
-      <ProductFilter/>
+      <ProductFilter :priceMin.sync="filterPriseMin"
+      :priceMax.sync="filterPriseMax" :categori.sync="filterCategoriId" :color.sync="filterColor"/>
     <section class="catalog">
       <ProductList :products = "products"/>
       <BasePagination v-model="page" @pages="page" :allProducts="lengthProducts"
@@ -50,7 +51,10 @@ export default {
       }
       if (this.filterCategoriId !== 0) {
         filterProducts = (
-          filterProducts.filter((product) => product.categoriId === this.filterCategoriId));
+          filterProducts.filter((product) => product.сategoriId === this.filterCategoriId));
+      }
+      if (this.filterColor !== 0) {
+        filterProducts = filterProducts.filter((colors) => colors.color.includes(this.filterColor));
       }
       return filterProducts;
     },
