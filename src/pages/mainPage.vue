@@ -13,8 +13,7 @@
       <ProductFilter :priceMin.sync="filterPriseMin"
       :priceMax.sync="filterPriseMax" :categori.sync="filterCategoriId" :color.sync="filterColor"/>
     <section class="catalog">
-      <ProductList :products = "products"
-      @goto-page="(pageNaw, pageNawParams) => $emit('goto-page', pageNaw, pageNawParams)"/>
+      <ProductList :products = "products"/>
       <BasePagination v-model="page" @pages="page" :allProducts="lengthProducts"
       :pageProducts="productsPerPage"/>
     </section>

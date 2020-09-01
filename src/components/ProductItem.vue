@@ -1,14 +1,14 @@
 <template>
     <li class="catalog__item">
-        <a class="catalog__pic" href="#">
+        <router-link class="catalog__pic" :to="{name: 'product', params: {id: products.id}}">
             <img :src="products.img" :alt="products.name" />
-        </a>
+        </router-link>
 
         <h3 class="catalog__title">
             <a href="#">{{products.name}}</a>
         </h3>
 
-        <span class="catalog__price">{{products.price}} ₽</span>
+        <span class="catalog__price">{{products.price | numberFilter}} ₽</span>
 
         <ul class="colors colors--black">
             <li class="colors__item">
@@ -34,12 +34,17 @@
 </template>
 
 <script>
+import numberFilter from '../hellpers/numberFilter';
+
 export default {
   props: ['products'],
   data() {
     return {
       color: '#73B6EA',
     };
+  },
+  filters: {
+    numberFilter,
   },
 };
 </script>

@@ -3,18 +3,18 @@
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="index.html">
+          <router-link class="breadcrumbs__link" :to="{ name: 'main' }">
             Каталог
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="#">
-            Мобильный транспорт
-          </a>
+          <router-link class="breadcrumbs__link" :to="{ name: 'main' }">
+            {{ catgoriParms.title }}
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link">
-            Смартфон Xiaomi Mi Mix 3 6/128GB
+            {{ productParms.name }}
           </a>
         </li>
       </ul>
@@ -24,49 +24,19 @@
       <div class="item__pics pics">
         <div class="pics__wrapper">
           <img width="570" height="570"
-          src="img/phone-square.jpg" srcset="img/phone-square@2x.jpg 2x" alt="Название товара">
+          :src="productParms.img" srcset="img/phone-square@2x.jpg 2x" :alt="productParms.name">
         </div>
-        <ul class="pics__list">
-          <li class="pics__item">
-            <a href="" class="pics__link pics__link--current">
-              <img width="98" height="98"
-              src="img/phone-square-1.jpg"
-              srcset="img/phone-square-1@2x.jpg 2x" alt="Название товара">
-            </a>
-          </li>
-          <li class="pics__item">
-            <a href="" class="pics__link">
-              <img width="98" height="98"
-              src="img/phone-square-2.jpg"
-              srcset="img/phone-square-2@2x.jpg 2x" alt="Название товара">
-            </a>
-          </li>
-          <li class="pics__item">
-            <a href="" class="pics__link">
-              <img width="98" height="98"
-              src="img/phone-square-3.jpg"
-              srcset="img/phone-square-3@2x.jpg 2x" alt="Название товара">
-            </a>
-          </li>
-          <li class="pics__item">
-            <a class="pics__link" href="#">
-              <img width="98" height="98"
-              src="img/phone-square-4.jpg"
-              srcset="img/phone-square-4@2x.jpg 2x" alt="Название товара">
-            </a>
-          </li>
-        </ul>
       </div>
 
       <div class="item__info">
-        <span class="item__code">Артикул: 150030</span>
+        <span class="item__code">Артикул: {{ productParms.id }}</span>
         <h2 class="item__title">
-          Смартфон Xiaomi Mi Mix 3 6/128GB
+          {{ productParms.name }}
         </h2>
         <div class="item__form">
-          <form class="form" action="#" method="POST">
+          <form class="form" action="#" method="POST" @submit.prevent="addProduct">
             <b class="item__price">
-              18 990 ₽
+              {{ productParms.price | numberFilter }} ₽
             </b>
 
             <fieldset class="form__block">
@@ -138,7 +108,7 @@
                   </svg>
                 </button>
 
-                <input type="text" value="1" name="count">
+                <input type="text" v-model.number="productAmount">
 
                 <button type="button" aria-label="Добавить один товар">
                   <svg width="12" height="12" fill="currentColor">
@@ -224,7 +194,34 @@
 </template>
 
 <script>
-export default {
+import products from '@/data/products';
+import сategoris from '@/data/сategori';
+import numberFilter from '../hellpers/numberFilter';
 
+export default {
+  data() {
+    return {
+      productAmount: 1,
+    };
+  },
+  computed: {
+    productParms() {
+      return products.find((product) => product.id === +this.$route.params.id);
+    },
+    catgoriParms() {
+      return сategoris.find(
+        (сategori) => (сategori.id === +this.$route.params.id),
+      );
+    },
+  },
+  methods: {
+    addProduct() {
+      this.$store.commit('addProductToCart',
+        { prodId: this.productParms.id, amount: this.productAmount });
+    },
+  },
+  filters: {
+    numberFilter,
+  },
 };
 </script>
