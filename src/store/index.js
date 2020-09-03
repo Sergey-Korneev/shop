@@ -11,15 +11,22 @@ export default new Vuex.Store({
     ],
   },
   mutations: {
-    addProductToCart(state, component) {
-      const product = state.cartProducts.find((prod) => prod.prodId === component.prodId);
+    addProductToCart(state, { prodId, amount }) {
+      const product = state.cartProducts.find((prod) => prod.prodId === prodId);
       if (product) {
-        product.amount += component.amount;
+        product.amount += amount;
       } else {
         state.cartProducts.push({
-          prodId: component.prodId,
-          amount: component.amount,
+          prodId,
+          amount,
         });
+      }
+    },
+    cartProductAmount(state, { prodId, amount }) {
+      const product = state.cartProducts.find((prod) => prod.prodId === prodId);
+
+      if (product) {
+        product.amount = amount;
       }
     },
   },
@@ -31,8 +38,9 @@ export default new Vuex.Store({
       }));
     },
     allProductSum(state, getters) {
-        return getters.productDtalParams.reduce(
-            (sum, item) => sum + (item.product.price * item.amount), 0);
-    }
+      return getters.productDtalParams.reduce(
+        (sum, item) => (item.prod.price * item.amount) + sum, 0,
+      );
+    },
   },
 });
