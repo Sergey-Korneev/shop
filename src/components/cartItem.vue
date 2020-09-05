@@ -14,7 +14,7 @@
               </span>
 
               <div class="product__counter form__counter">
-                <button type="button" aria-label="Убрать один товар">
+                <button type="button" aria-label="Убрать один товар" @click="subtract">
                   <svg width="10" height="10" fill="currentColor">
                     <use xlink:href="#icon-minus"></use>
                   </svg>
@@ -22,7 +22,7 @@
 
                 <input type="text" v-model.number="amount" name="count">
 
-                <button type="button" aria-label="Добавить один товар">
+                <button type="button" aria-label="Добавить один товар" @click="add">
                   <svg width="10" height="10" fill="currentColor">
                     <use xlink:href="#icon-plus"></use>
                   </svg>
@@ -33,7 +33,7 @@
                 {{ (index.prod.price * index.amount) | fomatNum}} ₽
               </b>
 
-              <button class="product__del button-del"
+              <button @click="remove" class="product__del button-del"
               type="button" aria-label="Удалить товар из корзины">
                 <svg width="20" height="20" fill="currentColor">
                   <use xlink:href="#icon-close"></use>
@@ -56,6 +56,17 @@ export default {
       set(value) {
         this.$store.commit('cartProductAmount', { prodId: this.index.prod.id, amount: value });
       },
+    },
+  },
+  methods: {
+    add() {
+      this.$store.commit('cartProductAmountAdd', this.index.prod.id);
+    },
+    subtract() {
+      this.$store.commit('cartProductAmountSubtract', this.index.prod.id);
+    },
+    remove() {
+      this.$store.commit('cartProductRemove', this.index.prod.id);
     },
   },
 };

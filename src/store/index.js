@@ -29,6 +29,23 @@ export default new Vuex.Store({
         product.amount = amount;
       }
     },
+    cartProductAmountAdd(state, prodId) {
+      const product = state.cartProducts.find((prod) => prod.prodId === prodId);
+
+      if (product) {
+        product.amount += 1;
+      }
+    },
+    cartProductAmountSubtract(state, prodId) {
+      const product = state.cartProducts.find((prod) => prod.prodId === prodId);
+
+      if (product.amount > 1) {
+        product.amount -= 1;
+      }
+    },
+    cartProductRemove(state, prodId) {
+      state.cartProducts = state.cartProducts.filter((item) => item.prodId !== prodId);
+    },
   },
   getters: {
     productDtalParams(state) {
