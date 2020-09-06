@@ -14,7 +14,7 @@
       :priceMax.sync="filterPriseMax" :categori.sync="filterCategoriId" :color.sync="filterColor"/>
     <section class="catalog">
       <ProductList :products = "products"/>
-      <BasePagination v-model="page" @pages="page" :allProducts="lengthProducts"
+      <BasePagination v-model="page" :allProducts="lengthProducts"
       :pageProducts="productsPerPage"/>
     </section>
     </div>
@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import products from '@/data/products';
 import ProductList from '@/components/PorductList.vue';
 import BasePagination from '@/components/BasePagination.vue';
 import ProductFilter from '@/components/ProductFilter.vue';
@@ -42,23 +41,6 @@ export default {
     };
   },
   computed: {
-    filterProducts() {
-      let filterProducts = products;
-      if (this.filterPriseMin > 0) {
-        filterProducts = filterProducts.filter((product) => product.price > this.filterPriseMin);
-      }
-      if (this.filterPriseMax > 0) {
-        filterProducts = filterProducts.filter((product) => product.price < this.filterPriseMax);
-      }
-      if (this.filterCategoriId !== 0) {
-        filterProducts = (
-          filterProducts.filter((product) => product.сategoriId === this.filterCategoriId));
-      }
-      if (this.filterColor !== 0) {
-        filterProducts = filterProducts.filter((colors) => colors.color.includes(this.filterColor));
-      }
-      return filterProducts;
-    },
     products() {
       return this.productsData ? this.productsData.items.map((prod) => ({
         ...prod,
@@ -71,7 +53,14 @@ export default {
   },
   methods: {
     loadProducts() {
-      axios.get(`https://vue-study.dev.creonit.ru/api/products?page=${this.page}&limit=${this.productsPerPage}`)
+      axios.get('https://vue-study.dev.creonit.ru/api/products', {
+        params: {
+          page: this.page,
+          limit: this.productsPerPage,
+          minPrice: this.filterPriseMin,
+          maxPrice: this.filterPriseMax,
+        },
+      })
         .then((response) => {
           this.productsData = response.data;
         });
@@ -79,6 +68,15 @@ export default {
   },
   watch: {
     page() {
+      this.loadProducts();
+    },
+    productsPerPage() {
+      this.loadProducts();
+    },
+    filterPriseMin() {
+      this.loadProducts();
+    },
+    filterPriseMax() {
       this.loadProducts();
     },
   },
