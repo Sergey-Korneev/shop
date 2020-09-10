@@ -109,9 +109,21 @@
 </template>
 
 <script>
+import { mapActions, mapMutations } from 'vuex';
 import cartIndekator from './components/cartIndekator.vue';
 
 export default {
   components: { cartIndekator },
+  created() {
+    const userAcsessKey = localStorage.getItem('userAccessKey');
+    if (userAcsessKey) {
+      this.uppdateUserAccessKey(userAcsessKey);
+    }
+    this.loadCart();
+  },
+  methods: {
+    ...mapActions(['loadCart']),
+    ...mapMutations(['uppdateUserAccessKey']),
+  },
 };
 </script>

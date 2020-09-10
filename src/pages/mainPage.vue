@@ -8,10 +8,20 @@
         {{lengthProducts}} товара
       </span>
     </div>
-
+    <div v-if="productsLoadingError">
+      <p>
+        Ошибка загрузки <button @click="loadProducts()">попробовать снова</button>
+      </p>
+    </div>
+    <div v-if="productsLoading">
+      <p>
+        Загрузка товаров...
+      </p>
+    </div>
     <div class="content__catalog">
       <ProductFilter :priceMin.sync="filterPriseMin"
       :priceMax.sync="filterPriseMax" :categori.sync="filterCategoriId" :color.sync="filterColor"/>
+
     <section class="catalog">
       <ProductList :products = "products"/>
       <BasePagination v-model="page" :allProducts="lengthProducts"
@@ -38,6 +48,8 @@ export default {
       page: 1,
       productsPerPage: 3,
       productsData: null,
+      productsLoading: false,
+      productsLoadingError: false,
     };
   },
   computed: {
@@ -53,17 +65,29 @@ export default {
   },
   methods: {
     loadProducts() {
-      axios.get('https://vue-study.dev.creonit.ru/api/products', {
-        params: {
-          page: this.page,
-          limit: this.productsPerPage,
-          minPrice: this.filterPriseMin,
-          maxPrice: this.filterPriseMax,
-        },
-      })
-        .then((response) => {
-          this.productsData = response.data;
-        });
+      this.productsLoading = true;
+      clearTimeout(this.loadProductsTimer);
+      this.loadProductsTimer = setTimeout(() => {
+        axios.get('https://vue-study.dev.creonit.ru/api/products', {
+          params: {
+            page: this.page,
+            limit: this.productsPerPage,
+            minPrice: this.filterPriseMin,
+            maxPrice: this.filterPriseMax,
+            colorId: this.filterColor,
+            categoryId: this.filterCategoriId,
+          },
+        })
+          .then((response) => {
+            this.productsData = response.data;
+          })
+          .catch(() => {
+            this.productsLoadingError = true;
+          })
+          .then(() => {
+            this.productsLoading = false;
+          });
+      }, 500);
     },
   },
   watch: {
@@ -77,6 +101,12 @@ export default {
       this.loadProducts();
     },
     filterPriseMax() {
+      this.loadProducts();
+    },
+    filterColor() {
+      this.loadProducts();
+    },
+    filterCategoriId() {
       this.loadProducts();
     },
   },

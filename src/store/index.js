@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import products from '@/data/products';
+import axios from 'axios';
 
 Vue.use(Vuex);
 
@@ -9,6 +10,8 @@ export default new Vuex.Store({
     cartProducts: [
       { prodId: 2, amount: 3 },
     ],
+    userAccessKey: null,
+    cartProductData: [],
   },
   mutations: {
     addProductToCart(state, { prodId, amount }) {
@@ -46,6 +49,12 @@ export default new Vuex.Store({
     cartProductRemove(state, prodId) {
       state.cartProducts = state.cartProducts.filter((item) => item.prodId !== prodId);
     },
+    uppdateUserAccessKey(state, accessKey) {
+      state.userAccessKey = accessKey;
+    },
+    uppdateCartProduct(state, item) {
+      state.cartProducts = item;
+    },
   },
   getters: {
     productDtalParams(state) {
@@ -58,6 +67,22 @@ export default new Vuex.Store({
       return getters.productDtalParams.reduce(
         (sum, item) => (item.prod.price * item.amount) + sum, 0,
       );
+    },
+  },
+  actions: {
+    loadCart(context) {
+      axios.get('http://vue-study.dev.creonit.ru/api/baskets', {
+        params: {
+          userAccessKey: this.state.userAccessKey,
+        },
+      })
+        .then((dataLoad) => {
+          if (!this.state.userAccessKey) {
+            localStorage.setItem('userAccessKey', dataLoad.data.user.accessKey);
+            context.commit('uppdateUserAccessKey', dataLoad.data.user.accessKey);
+          }
+          context.commit('uppdateCartProduct', dataLoad.data.items);
+        });
     },
   },
 });

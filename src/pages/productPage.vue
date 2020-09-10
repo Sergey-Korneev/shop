@@ -1,5 +1,5 @@
 <template>
-    <main class="content container">
+    <main class="content container" v-if="productsData">
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -14,7 +14,7 @@
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link">
-            {{ productParms.name }}
+            {{ productParms.title }}
           </a>
         </li>
       </ul>
@@ -24,14 +24,14 @@
       <div class="item__pics pics">
         <div class="pics__wrapper">
           <img width="570" height="570"
-          :src="productParms.img" srcset="img/phone-square@2x.jpg 2x" :alt="productParms.name">
+          :src="productParms.image.file.url" :alt="productParms.name">
         </div>
       </div>
 
       <div class="item__info">
         <span class="item__code">Артикул: {{ productParms.id }}</span>
         <h2 class="item__title">
-          {{ productParms.name }}
+          {{ productParms.title }}
         </h2>
         <div class="item__form">
           <form class="form" action="#" method="POST" @submit.prevent="addProduct">
@@ -42,28 +42,13 @@
             <fieldset class="form__block">
               <legend class="form__legend">Цвет:</legend>
               <ul class="colors">
-                <li class="colors__item">
+                <li class="colors__item" v-for="color in colors" :key="color">
                   <label class="colors__label">
                     <input class="colors__radio sr-only"
-                    type="radio" name="color-item" value="blue" checked="">
-                    <span class="colors__value" style="background-color: #73B6EA;">
+                    type="radio" name="color-item" :value="color" checked="">
+                    <span class="colors__value" :style="{background: color.code}">
                     </span>
                   </label>
-                </li>
-                <li class="colors__item">
-                  <label class="colors__label">
-                    <input class="colors__radio sr-only"
-                    type="radio" name="color-item" value="yellow">
-                    <span class="colors__value" style="background-color: #FFBE15;">
-                    </span>
-                  </label>
-                </li>
-                <li class="colors__item">
-                  <label class="colors__label">
-                    <input class="colors__radio sr-only"
-                    type="radio" name="color-item" value="gray">
-                    <span class="colors__value" style="background-color: #939393;">
-                  </span></label>
                 </li>
               </ul>
             </fieldset>
@@ -194,27 +179,34 @@
 </template>
 
 <script>
-import products from '@/data/products';
-import сategoris from '@/data/сategori';
+import axios from 'axios';
 import numberFilter from '../hellpers/numberFilter';
 
 export default {
   data() {
     return {
       productAmount: 1,
+      productsData: null,
     };
   },
   computed: {
     productParms() {
-      return products.find((product) => product.id === +this.$route.params.id);
+      return this.productsData;
     },
     catgoriParms() {
-      return сategoris.find(
-        (сategori) => (сategori.id === +this.$route.params.id),
-      );
+      return this.productsData.category;
+    },
+    colors() {
+      return this.productParms.colors;
     },
   },
   methods: {
+    loadProduct() {
+      axios.get(`http://vue-study.dev.creonit.ru/api/products/${this.$route.params.id}`)
+        .then((prod) => {
+          this.productsData = prod.data;
+        });
+    },
     addProduct() {
       this.$store.commit('addProductToCart',
         { prodId: this.productParms.id, amount: this.productAmount });
@@ -226,8 +218,16 @@ export default {
       return this.productAmount;
     },
   },
+  watch: {
+    '$route.params.id': function () {
+      this.loadProduct();
+    },
+  },
   filters: {
     numberFilter,
+  },
+  created() {
+    this.loadProduct();
   },
 };
 </script>

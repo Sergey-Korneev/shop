@@ -32,11 +32,11 @@
           <fieldset class="form__block">
             <legend class="form__legend">Цвет</legend>
             <ul class="colors">
-              <li class="colors__item" v-for="colorPunct in colorFilt" :key="colorPunct">
+              <li class="colors__item" v-for="colorItem in colorPunct" :key="colorItem.id">
                 <label class="colors__label">
                   <input class="colors__radio sr-only"
-                  type="radio" name="color" :value="colorPunct" checked="" v-model="curentColor">
-                  <span class="colors__value" v-bind:style="{background: colorPunct}">
+                  type="radio" name="color" :value="colorItem.id" checked="" v-model="curentColor">
+                  <span class="colors__value" v-bind:style="{background: colorItem.code}">
                   </span>
                 </label>
               </li>
@@ -117,17 +117,18 @@
 </template>
 
 <script>
-import category from '../data/сategori';
+import axios from 'axios';
 
 export default {
   props: ['priceMin', 'priceMax', 'categori', 'color'],
   data() {
     return {
-      colorFilt: ['#FFBE15', '#73B6EA', '#939393', '#8BE000', '#FF6B00', '#FFF', '#000'],
       curentPriceMin: 0,
       curentPriceMax: 0,
       curentCategoriId: 0,
       curentColor: 0,
+      colorData: null,
+      categryData: null,
     };
   },
   watch: {
@@ -157,11 +158,30 @@ export default {
       this.$emit('update:categori', 0);
       this.$emit('update:color', 0);
     },
+    colorList() {
+      axios.get('http://vue-study.dev.creonit.ru/api/colors')
+        .then((col) => {
+          this.colorData = col.data.items;
+        });
+    },
+    loadCategry() {
+      axios.get('http://vue-study.dev.creonit.ru/api/productCategories')
+        .then((category) => {
+          this.categryData = category.data.items;
+        });
+    },
   },
   computed: {
     category() {
-      return category;
+      return this.categryData ? this.categryData : [];
     },
+    colorPunct() {
+      return this.colorData ? this.colorData : [];
+    },
+  },
+  created() {
+    this.colorList();
+    this.loadCategry();
   },
 };
 </script>
