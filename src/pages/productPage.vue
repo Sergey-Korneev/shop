@@ -1,5 +1,15 @@
 <template>
-    <main class="content container" v-if="productsData">
+    <main class="content container" v-if="productLoading">
+        <h1>
+            Загрузка страници...
+        </h1>
+      </main>
+    <main class="content container" v-else-if="productLoadingError">
+        <h1>
+            Ошибка загрузка страници
+        </h1>
+      </main>
+    <main class="content container" v-else>
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -19,7 +29,6 @@
         </li>
       </ul>
     </div>
-
     <section class="item">
       <div class="item__pics pics">
         <div class="pics__wrapper">
@@ -95,7 +104,7 @@
 
                 <input type="text" v-model.number="productAmount">
 
-                <button type="button" aria-label="Добавить один товар" @click="productAmount++">
+                <button type="button" aria-label="Добавить один товар" @click="add">
                   <svg width="12" height="12" fill="currentColor">
                     <use xlink:href="#icon-plus"></use>
                   </svg>
@@ -105,6 +114,12 @@
               <button class="button button--primery" type="submit">
                 В корзину
               </button>
+            </div>
+            <div v-if="productAdd">
+              Добавление товара...
+            </div>
+            <div v-if="productAddFinish">
+              Товар добавлен!
             </div>
           </form>
         </div>
@@ -180,6 +195,7 @@
 
 <script>
 import axios from 'axios';
+import { mapActions } from 'vuex';
 import numberFilter from '../hellpers/numberFilter';
 
 export default {
@@ -187,6 +203,10 @@ export default {
     return {
       productAmount: 1,
       productsData: null,
+      productLoading: false,
+      productLoadingError: false,
+      productAdd: false,
+      productAddFinish: false,
     };
   },
   computed: {
@@ -201,21 +221,41 @@ export default {
     },
   },
   methods: {
+    ...mapActions(['addProductToCart']),
+
     loadProduct() {
-      axios.get(`http://vue-study.dev.creonit.ru/api/products/${this.$route.params.id}`)
-        .then((prod) => {
-          this.productsData = prod.data;
-        });
+      this.productLoading = true;
+      this.productLoadingError = false;
+
+      this.loadProductsTimer = setTimeout(() => {
+        axios.get(`http://vue-study.dev.creonit.ru/api/products/${this.$route.params.id}`)
+          .then((prod) => {
+            this.productsData = prod.data;
+          })
+          .catch(() => {
+            this.productLoadingError = true;
+          })
+          .then(() => {
+            this.productLoading = false;
+          });
+      }, 500);
     },
     addProduct() {
-      this.$store.commit('addProductToCart',
-        { prodId: this.productParms.id, amount: this.productAmount });
+      this.productAdd = true;
+      this.productAddFinish = false;
+      this.addProductToCart({ productId: this.productParms.id, amount: this.productAmount })
+        .then(() => {
+          this.productAdd = false;
+          this.productAddFinish = true;
+        });
+    },
+    add() {
+      this.productAmount += 1;
     },
     subtract() {
       if (this.productAmount > 1) {
         this.productAmount -= 1;
       }
-      return this.productAmount;
     },
   },
   watch: {

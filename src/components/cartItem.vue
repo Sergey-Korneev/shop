@@ -1,7 +1,7 @@
 <template>
     <li class="cart__item product">
               <div class="product__pic">
-                <img :src="index.prod.img" width="120" height="120" :alt="index.name">
+                <img :src="index.img" width="120" height="120" :alt="index.name">
               </div>
               <h3 class="product__title">
                 {{index.prod.name}}
@@ -54,19 +54,25 @@ export default {
         return this.index.amount;
       },
       set(value) {
-        this.$store.commit('cartProductAmount', { prodId: this.index.prod.id, amount: value });
+        this.$store.dispatch('uppdateCartAmount', { productId: this.index.prod.id, amount: value });
       },
     },
   },
   methods: {
     add() {
-      this.$store.commit('cartProductAmountAdd', this.index.prod.id);
+      let amountAdd = this.index.amount;
+      amountAdd += 1;
+      this.$store.dispatch('uppdateCartAmountAdd', { productId: this.index.prod.id, amount: amountAdd });
     },
     subtract() {
-      this.$store.commit('cartProductAmountSubtract', this.index.prod.id);
+      let amountSubtract = this.index.amount;
+      if (amountSubtract > 1) {
+        amountSubtract -= 1;
+        this.$store.dispatch('uppdateCartAmountSubtract', { productId: this.index.prod.id, amount: amountSubtract });
+      }
     },
     remove() {
-      this.$store.commit('cartProductRemove', this.index.prod.id);
+      this.$store.dispatch('deleteCartProduct', this.index.prod.id);
     },
   },
 };
