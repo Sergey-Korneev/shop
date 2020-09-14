@@ -152,18 +152,22 @@ export default new Vuex.Store({
         });
     },
 
-    deleteCartProduct(context, prodId) {
-      context.commit('cartProductRemove', prodId);
-      console.log(prodId);
+    deleteCartProduct(context, productId) {
+      context.commit('cartProductAmountSubtract', productId);
 
       return axios.delete('http://vue-study.dev.creonit.ru/api/baskets/products', {
         params: {
           userAccessKey: this.state.userAccessKey,
         },
-        productId: prodId,
+        data: {
+          productId,
+        },
       })
         .then((dataLoad) => {
           context.commit('uppdateCartProduct', dataLoad.data.items);
+        })
+        .catch(() => {
+          context.commit('syncCartParams');
         });
     },
   },
