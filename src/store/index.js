@@ -9,8 +9,16 @@ export default new Vuex.Store({
     cartProducts: [],
     userAccessKey: null,
     cartProductData: [],
+    orderInfo: [],
   },
   mutations: {
+    updateOrderInfo(state, order) {
+      state.orderInfo = order;
+    },
+    order(state) {
+      state.cartProductData = [];
+      state.cartProducts = [];
+    },
     cartProductAmount(state, { prodId, amount }) {
       const product = state.cartProducts.find((prod) => prod.prodId === prodId);
 
@@ -66,6 +74,16 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    uppdateOrderInfo(context, orderId) {
+      return axios.get(`http://vue-study.dev.creonit.ru/api/orders/${orderId}`, {
+        params: {
+          userAccessKey: this.state.userAccessKey,
+        },
+      })
+        .then((respons) => {
+          context.commit('updateOrderInfo', respons.data);
+        });
+    },
     loadCart(context) {
       axios.get('http://vue-study.dev.creonit.ru/api/baskets', {
         params: {
@@ -153,9 +171,11 @@ export default new Vuex.Store({
     },
 
     deleteCartProduct(context, productId) {
-      context.commit('cartProductAmountSubtract', productId);
+      context.commit('cartProductRemove', productId);
 
-      return axios.delete('http://vue-study.dev.creonit.ru/api/baskets/products', {
+      return axios.request({
+        url: 'http://vue-study.dev.creonit.ru/api/baskets/products',
+        method: 'delete',
         params: {
           userAccessKey: this.state.userAccessKey,
         },

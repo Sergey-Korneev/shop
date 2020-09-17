@@ -1,5 +1,5 @@
 <template>
-    <router-link class="header__cart" :to="{ name: 'cart'}" aria-label="Корзина с товарами">
+    <router-link class="header__cart" :to="{name: 'cart'}" aria-label="Корзина с товарами">
           <svg width="30" height="21" fill="currentColor">
             <use xlink:href="#icon-cart" />
           </svg>
