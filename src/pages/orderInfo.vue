@@ -20,7 +20,7 @@
       </ul>
 
       <h1 class="content__title">
-        Заказ оформлен <span>№ 23621</span>
+        Заказ оформлен <span>№ {{this.$route.params.id}}</span>
       </h1>
     </div>
 
@@ -39,7 +39,7 @@
                 Получатель
               </span>
               <span class="dictionary__value">
-                Иванова Василиса Алексеевна
+                {{orderInfoParams.name}}
               </span>
             </li>
             <li class="dictionary__item">
@@ -47,7 +47,7 @@
                 Адрес доставки
               </span>
               <span class="dictionary__value">
-                Москва, ул. Ленина, 21, кв. 33
+                {{orderInfoParams.address}}
               </span>
             </li>
             <li class="dictionary__item">
@@ -55,7 +55,7 @@
                 Телефон
               </span>
               <span class="dictionary__value">
-                8 800 989 74 84
+                {{orderInfoParams.phone}}
               </span>
             </li>
             <li class="dictionary__item">
@@ -63,7 +63,7 @@
                 Email
               </span>
               <span class="dictionary__value">
-                lalala@mail.ru
+                {{orderInfoParams.email}}
               </span>
             </li>
             <li class="dictionary__item">
@@ -79,26 +79,17 @@
 
         <div class="cart__block">
           <ul class="cart__orders">
-            <li class="cart__order">
-              <h3>Смартфон Xiaomi Redmi Note 7 Pro 6/128GB</h3>
-              <b>18 990 ₽</b>
-              <span>Артикул: 150030</span>
-            </li>
-            <li class="cart__order">
-              <h3>Гироскутер Razor Hovertrax 2.0ii</h3>
-              <b>4 990 ₽</b>
-              <span>Артикул: 150030</span>
-            </li>
-            <li class="cart__order">
-              <h3>Электрический дрифт-карт Razor Lil’ Crazy</h3>
-              <b>8 990 ₽</b>
-              <span>Артикул: 150030</span>
+            <li class="cart__order" v-for="item in orderInfoParams.basket.items" :key="item.id">
+              <h3>{{item.product.title}}</h3>
+              <b>{{item.product.price | numberFiltet}} ₽</b>
+              <span>Артикул: {{item.product.id}}</span>
             </li>
           </ul>
 
           <div class="cart__total">
             <p>Доставка: <b>500 ₽</b></p>
-            <p>Итого: <b>3</b> товара на сумму <b>37 970 ₽</b></p>
+            <p>Итого: <b>{{lenghtParodycts}}</b> товара на сумму <b>
+              {{ orderInfoParams.totalPrice | numberFiltet}} ₽</b></p>
           </div>
         </div>
       </form>
@@ -107,12 +98,19 @@
 </template>
 
 <script>
+import numberFiltet from '@/hellpers/numberFilter';
+
 export default {
   computed: {
     orderInfoParams() {
       return this.$store.state.orderInfo;
     },
+    lenghtParodycts() {
+      return this.orderInfoParams.basket.items.length;
+    },
   },
+
+  filters: { numberFiltet },
 
   created() {
     if (this.$store.state.orderInfo && this.$store.state.orderInfo.id === this.$route.params.id) {
